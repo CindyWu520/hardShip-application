@@ -1,9 +1,13 @@
 package com.assignment.hardship.dto;
 
 import enums.Status;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Builder
+@Data
 public class HardshipSummaryResponse {
     private Long hardshipId;
     private String name;

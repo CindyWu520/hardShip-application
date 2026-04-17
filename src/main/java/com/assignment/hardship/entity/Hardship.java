@@ -4,6 +4,7 @@ import enums.Status;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity(name = "hardship")
+@EntityListeners(AuditingEntityListener.class)
 public class Hardship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +38,8 @@ public class Hardship {
     @Column(name = "hardship_reason")
     private String reason; // optional
 
-    @Column(name = "status")
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private Status status;
 
     @OneToOne
@@ -44,10 +47,10 @@ public class Hardship {
     private Customer customer;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

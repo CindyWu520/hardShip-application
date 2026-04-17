@@ -11,7 +11,7 @@ import java.util.List;
 public interface HardshipService {
     HardshipResponse registerHardship(HardshipRequest request);
 
-    HardshipResponse updateHardship(HardshipRequest request);
+    HardshipResponse updateHardship(Long id, HardshipRequest request);
 
     List<HardshipSummaryResponse> getAllHardship();
 }

@@ -6,21 +6,21 @@ import com.assignment.hardship.dto.HardshipSummaryResponse;
 import com.assignment.hardship.entity.Customer;
 import com.assignment.hardship.entity.Hardship;
 import com.assignment.hardship.entity.HardshipHistory;
+import com.assignment.hardship.exception.ErrorCode;
+import com.assignment.hardship.exception.HardShipException;
 import com.assignment.hardship.mapper.HardshipMapper;
 import com.assignment.hardship.repo.CustomerRepository;
 import com.assignment.hardship.repo.HardshipHistoryRepository;
 import com.assignment.hardship.repo.HardshipRepository;
 import enums.Status;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class HardshipServiceImpl implements HardshipService {
     private final HardshipMapper hardshipMapper;
     private final CustomerRepository customerRepo;
@@ -28,8 +28,12 @@ public class HardshipServiceImpl implements HardshipService {
     private final HardshipHistoryRepository hardshipHistoryRepo;
 
     @Override
+    @Transactional
     public HardshipResponse registerHardship(HardshipRequest request) {
-        // TODO: check duplicate request
+        // check duplicate request
+        if (hardshipRepo.existsByCustomerName(request.getName())) {
+            throw new HardShipException(ErrorCode.HARDSHIP_ALREADY_EXISTS);
+        }
 
         // build DTO and save to DB
         Customer savedCustomer = customerRepo.save(hardshipMapper.buildCustomer(request));
@@ -37,13 +41,10 @@ public class HardshipServiceImpl implements HardshipService {
         Hardship hardship = hardshipMapper.buildHardship(request);
         hardship.setStatus(Status.PENDING);
         hardship.setCustomer(savedCustomer);
-        hardship.setCreatedAt(LocalDateTime.now());
-        hardship.setUpdatedAt(LocalDateTime.now());
         Hardship savedHardship = hardshipRepo.save(hardship);
 
         HardshipHistory hardshipHistory = hardshipMapper.buildHardshipHistory(request);
         hardshipHistory.setHardship(savedHardship);
-        hardshipHistory.setUpdatedAt(LocalDateTime.now());
         hardshipHistoryRepo.save(hardshipHistory);
 
         // build response
@@ -51,12 +52,31 @@ public class HardshipServiceImpl implements HardshipService {
     }
 
     @Override
-    public HardshipResponse updateHardship(HardshipRequest request) {
-        return null;
+    @Transactional
+    public HardshipResponse updateHardship(Long id, HardshipRequest request) {
+        Hardship hardship = hardshipRepo.findById(id)
+                .orElseThrow(() -> new HardShipException(ErrorCode.HARDSHIP_NOT_FOUND));
+        // always save super table then child table
+        Customer customer = hardship.getCustomer();
+        hardshipMapper.updateCustomer(request, customer);
+        customerRepo.save(customer);
+
+        hardshipMapper.updateHardship(request, hardship);
+        Hardship savedHardship = hardshipRepo.save(hardship);
+
+        HardshipHistory hardshipHistory = hardshipMapper.buildHardshipHistory(request);
+        hardshipHistory.setHardship(savedHardship);
+        hardshipHistoryRepo.save(hardshipHistory);
+
+        return hardshipMapper.buildResponse(savedHardship);
     }
 
     @Override
+    //@Transactional(readOnly = true)
     public List<HardshipSummaryResponse> getAllHardship() {
-        return null;
+        List<Hardship> hardships = hardshipRepo.findAll();
+        return hardships.stream()
+                .map(hardshipMapper::buildSummaryResponse)
+                .toList();
     }
 }
