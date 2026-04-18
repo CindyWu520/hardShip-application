@@ -19,9 +19,18 @@ public class GlobalExceptionHandler {
         Map<String, String> validationErrors = ex.getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        DefaultMessageSourceResolvable::getDefaultMessage
+                        DefaultMessageSourceResolvable::getDefaultMessage,
+                        (existing, duplicate) -> existing
                 ));
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of(ErrorCode.BAD_REQUEST, validationErrors));
+    }
+
+    @ExceptionHandler(HardshipException.class)
+    public ResponseEntity<ErrorResponse> handleHardshipException(
+            HardshipException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(ErrorResponse.of(errorCode));
     }
 }

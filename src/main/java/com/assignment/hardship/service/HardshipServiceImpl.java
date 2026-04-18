@@ -7,15 +7,15 @@ import com.assignment.hardship.entity.Customer;
 import com.assignment.hardship.entity.Hardship;
 import com.assignment.hardship.entity.HardshipHistory;
 import com.assignment.hardship.exception.ErrorCode;
-import com.assignment.hardship.exception.HardShipException;
+import com.assignment.hardship.exception.HardshipException;
 import com.assignment.hardship.mapper.HardshipMapper;
 import com.assignment.hardship.repo.CustomerRepository;
 import com.assignment.hardship.repo.HardshipHistoryRepository;
 import com.assignment.hardship.repo.HardshipRepository;
 import enums.Status;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class HardshipServiceImpl implements HardshipService {
     public HardshipResponse registerHardship(HardshipRequest request) {
         // check duplicate request
         if (hardshipRepo.existsByCustomerName(request.getName())) {
-            throw new HardShipException(ErrorCode.HARDSHIP_ALREADY_EXISTS);
+            throw new HardshipException(ErrorCode.HARDSHIP_ALREADY_EXISTS);
         }
 
         // build DTO and save to DB
@@ -55,7 +55,7 @@ public class HardshipServiceImpl implements HardshipService {
     @Transactional
     public HardshipResponse updateHardship(Long id, HardshipRequest request) {
         Hardship hardship = hardshipRepo.findById(id)
-                .orElseThrow(() -> new HardShipException(ErrorCode.HARDSHIP_NOT_FOUND));
+                .orElseThrow(() -> new HardshipException(ErrorCode.HARDSHIP_NOT_FOUND));
         // always save super table then child table
         Customer customer = hardship.getCustomer();
         hardshipMapper.updateCustomer(request, customer);
@@ -72,7 +72,7 @@ public class HardshipServiceImpl implements HardshipService {
     }
 
     @Override
-    //@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<HardshipSummaryResponse> getAllHardship() {
         List<Hardship> hardships = hardshipRepo.findAll();
         return hardships.stream()

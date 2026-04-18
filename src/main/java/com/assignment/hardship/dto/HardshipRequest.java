@@ -32,7 +32,6 @@ public class HardshipRequest {
     @DecimalMin("0.01")
     @NotNull(message = "expenses can't be null")
     @Digits(integer = 10, fraction = 2)
-    @NotNull
     private BigDecimal expenses;
 
     @Size(max = 522)

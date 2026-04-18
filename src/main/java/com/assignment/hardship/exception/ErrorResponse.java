@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -13,7 +13,7 @@ public class ErrorResponse {
     private final String errorCode;
     private final String message;
     private final int status; // int
-    private final LocalDate timestamp; // add timestamp
+    private final LocalDateTime timestamp; // add timestamp
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Map<String, String> fieldErrors;
 
@@ -23,7 +23,16 @@ public class ErrorResponse {
                 .message(errorCode.getMessage())
                 .status(errorCode.getHttpStatus().value())
                 .fieldErrors(fieldErrors)
-                .timestamp(LocalDate.now())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static ErrorResponse of(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+                .errorCode(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .status(errorCode.getHttpStatus().value())
+                .timestamp(LocalDateTime.now())
                 .build();
     }
 }
