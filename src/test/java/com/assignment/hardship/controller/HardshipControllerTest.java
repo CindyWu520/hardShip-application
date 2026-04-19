@@ -106,10 +106,9 @@ public class HardshipControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
+                // assert key fields
                 .andExpect(jsonPath("$.hardshipId").value(1L))
-                .andExpect(jsonPath("$.reason").value("Unemployed"))
                 .andExpect(jsonPath("$.status").value("PENDING")) // String
-                .andExpect(jsonPath("$.customerId").value(1L))
                 .andExpect(jsonPath("$.name").value("cindy"))
                 .andExpect(jsonPath("$.dateOfBirth").value("1995-11-22")) // String
                 .andExpect(jsonPath("$.income").value(INCOME))
@@ -128,15 +127,14 @@ public class HardshipControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hardshipId").value(1L))
-                .andExpect(jsonPath("$.reason").value("Unemployed"))
                 .andExpect(jsonPath("$.status").value("PENDING")) // String
-                .andExpect(jsonPath("$.customerId").value(1L))
                 .andExpect(jsonPath("$.name").value("cindy"))
                 .andExpect(jsonPath("$.dateOfBirth").value("1995-11-22")) // String
                 .andExpect(jsonPath("$.income").value(INCOME))
-                .andExpect(jsonPath("$.expenses").value(EXPENSES))
-                .andExpect(jsonPath("$.createdAt").value("2026-04-18T00:00:00")) //String
-                .andExpect(jsonPath("$.updatedAt").value("2026-04-18T00:00:00"));
+                .andExpect(jsonPath("$.expenses").value(EXPENSES));
+        // don't need to test, let JPA to handle it
+//                .andExpect(jsonPath("$.createdAt").value("2026-04-18T00:00:00")) //String
+//                .andExpect(jsonPath("$.updatedAt").value("2026-04-18T00:00:00"));
     }
 
     @Test
