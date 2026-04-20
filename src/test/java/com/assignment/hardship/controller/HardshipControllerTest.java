@@ -1,6 +1,6 @@
 package com.assignment.hardship.controller;
 
-import com.assignment.hardship.config.JpaAuditingConfig;
+import com.assignment.hardship.config.AppConfig;
 import com.assignment.hardship.dto.HardshipRequest;
 import com.assignment.hardship.dto.HardshipResponse;
 import com.assignment.hardship.dto.HardshipSummaryResponse;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = HardshipController.class, excludeAutoConfiguration = JpaAuditingConfig.class)
+@WebMvcTest(value = HardshipController.class, excludeAutoConfiguration = AppConfig.class)
 public class HardshipControllerTest {
     @Autowired
     private MockMvc mockMvc;

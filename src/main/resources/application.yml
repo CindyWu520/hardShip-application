@@ -1,10 +1,17 @@
 spring:
+  profiles:
+    active: local
   jpa:
     hibernate:
       ddl-auto: create #dev
     properties:
       hibernate:
         format_sql: true
-    show-sql: true
-  profile:
-    active: local
+      show-sql: true
+
+springDoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
