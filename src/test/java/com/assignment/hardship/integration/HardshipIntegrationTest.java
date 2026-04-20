@@ -1,4 +1,4 @@
-package com.assignment.hardship;
+package com.assignment.hardship.integration;
 
 import com.assignment.hardship.dto.HardshipRequest;
 import com.assignment.hardship.repo.CustomerRepository;

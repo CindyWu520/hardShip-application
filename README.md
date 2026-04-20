@@ -60,7 +60,7 @@ src/
 │   ├── java/com/assignment/hardship/
 │   │   ├── HardshipApplication.java         # Main entry point
 │   │   ├── config/
-│   │   │   ├── AppConfig.java        # JPA auditing config & OpenAPI config
+│   │   │   ├── AppConfig.java                # JPA auditing config & OpenAPI config
 │   │   ├── controller/
 │   │   │   └── HardshipController.java       # REST controller
 │   │   ├── dto/
@@ -104,7 +104,8 @@ src/
 │       └── application.yml                   # H2 test config
 └── docs/
     └── diagrams/
-        └── db-diagram.md                     # ERD diagram
+        └── db-diagram.png                     # ERD diagram
+        └── grafana-dashboard.png              # matrix diagram
 ```
 
 ---
