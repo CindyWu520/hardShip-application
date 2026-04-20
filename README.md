@@ -136,7 +136,7 @@ src/
     timestamp updated_at
   }
 
-  HARDSHIP_AUDIT_HISTORY {
+  HARDSHIP_HISTORY {
     bigint id PK
     bigint hardship_application_id FK
     string name
@@ -152,7 +152,7 @@ src/
 ### Relationships
 
 - `CUSTOMER` ↔ `HARDSHIP_APPLICATION` — One-to-One: one customer has exactly one hardship application
-- `HARDSHIP_APPLICATION` ↔ `HARDSHIP_AUDIT_HISTORY` — One-to-Many: every create and update saves a history snapshot
+- `HARDSHIP_APPLICATION` ↔ `HARDSHIP_HISTORY` — One-to-Many: every create and update saves a history snapshot
 
 ---
 
