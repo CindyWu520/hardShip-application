@@ -1,6 +1,6 @@
 package com.assignment.hardship.dto;
 
-import enums.Status;
+import com.assignment.hardship.enums.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

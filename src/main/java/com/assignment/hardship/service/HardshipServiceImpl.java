@@ -6,13 +6,14 @@ import com.assignment.hardship.dto.HardshipSummaryResponse;
 import com.assignment.hardship.entity.Customer;
 import com.assignment.hardship.entity.Hardship;
 import com.assignment.hardship.entity.HardshipHistory;
+import com.assignment.hardship.enums.Status;
 import com.assignment.hardship.exception.ErrorCode;
 import com.assignment.hardship.exception.HardshipException;
 import com.assignment.hardship.mapper.HardshipMapper;
 import com.assignment.hardship.repo.CustomerRepository;
 import com.assignment.hardship.repo.HardshipHistoryRepository;
 import com.assignment.hardship.repo.HardshipRepository;
-import enums.Status;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,46 +29,54 @@ public class HardshipServiceImpl implements HardshipService {
     private final CustomerRepository customerRepo;
     private final HardshipRepository hardshipRepo;
     private final HardshipHistoryRepository hardshipHistoryRepo;
+    private final MeterRegistry meterRegistry;
 
     @Override
     @Transactional
     public HardshipResponse registerHardship(HardshipRequest request) {
 
+        meterRegistry.counter("hardship.register.count").increment();
         log.info("Registering hardship application for customer: {}", request.getName());
 
         // check duplicate request
         if (hardshipRepo.existsByCustomerName(request.getName())) {
+            meterRegistry.counter("hardship.register.duplicate").increment();
             log.error("Hardship already exists. Customer name: {}", request.getName());
             throw new HardshipException(ErrorCode.HARDSHIP_ALREADY_EXISTS);
         }
 
-        // build DTO and save to DB
-        Customer savedCustomer = customerRepo.save(hardshipMapper.buildCustomer(request));
-        log.info("Customer information saved to DB. CustomerId: {}", savedCustomer.getId());
+        return meterRegistry.timer("hardship.register.timer")
+                .record(() -> {
+                    // build DTO and save to DB
+                    Customer savedCustomer = customerRepo.save(hardshipMapper.buildCustomer(request));
+                    log.info("Customer information saved to DB. CustomerId: {}", savedCustomer.getId());
 
-        Hardship hardship = hardshipMapper.buildHardship(request);
-        hardship.setStatus(Status.PENDING);
-        hardship.setCustomer(savedCustomer);
-        Hardship savedHardship = hardshipRepo.save(hardship);
-        log.info("Hardship application saved to DB. HardshipId: {}", savedHardship.getId());
+                    Hardship hardship = hardshipMapper.buildHardship(request);
+                    hardship.setStatus(Status.PENDING);
+                    hardship.setCustomer(savedCustomer);
+                    Hardship savedHardship = hardshipRepo.save(hardship);
+                    log.info("Hardship application saved to DB. HardshipId: {}", savedHardship.getId());
 
-        HardshipHistory hardshipHistory = hardshipMapper.buildHardshipHistory(request);
-        hardshipHistory.setHardship(savedHardship);
-        hardshipHistoryRepo.save(hardshipHistory);
-        log.info("Hardship history saved to DB. HardshipHistoryId: {}", hardshipHistory.getHardship());
+                    HardshipHistory hardshipHistory = hardshipMapper.buildHardshipHistory(request);
+                    hardshipHistory.setHardship(savedHardship);
+                    hardshipHistoryRepo.save(hardshipHistory);
+                    log.info("Hardship history saved to DB. HardshipHistoryId: {}", hardshipHistory.getHardship().getId());
 
-        // build response
-        return hardshipMapper.buildResponse(savedHardship);
+                    // build response
+                    return hardshipMapper.buildResponse(savedHardship);
+                });
     }
 
     @Override
     @Transactional
     public HardshipResponse updateHardship(Long id, HardshipRequest request) {
 
+        meterRegistry.counter("hardship.update.count").increment();
         log.info("Updating hardship application. HardshipId: {}", id);
 
         Hardship hardship = hardshipRepo.findById(id)
                 .orElseThrow(() -> {
+                    meterRegistry.counter("hardship.not.found.count").increment();
                     log.error("Hardship not found. HardshipId: {}", id);
                     return new HardshipException(ErrorCode.HARDSHIP_NOT_FOUND);
                 });

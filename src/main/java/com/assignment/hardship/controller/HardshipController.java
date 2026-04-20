@@ -32,7 +32,6 @@ import java.util.List;
 public class HardshipController {
     private final HardshipService hardshipService;
 
-    // TODO: Log + DB diagram
     @Operation(summary = "Register a new hardship application")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Hardship register successfully",

@@ -1,6 +1,6 @@
 package com.assignment.hardship.entity;
 
-import enums.Status;
+import com.assignment.hardship.enums.Status;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
