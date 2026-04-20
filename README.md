@@ -573,8 +573,7 @@ scrape_configs:
   - job_name: 'hardship-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'host.docker.internal:8080' ]  # Windows/Mac
-      # - targets: ['192.168.x.x:8080']         # use your IP if above doesn't work
+      - targets: [ 'host.docker.internal:8080' ]
 ```
 
 ---
