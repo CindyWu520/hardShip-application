@@ -28,7 +28,6 @@ The Hardship Application API provides:
 - Submit a new hardship application
 - Update an existing hardship application
 - Retrieve a list of all hardship applications
-- Retrieve a single hardship application by ID
 - Full audit history tracking on every create and update
 
 ---
