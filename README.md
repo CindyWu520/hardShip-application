@@ -104,8 +104,10 @@ src/
 │       └── application.yml                   # H2 test config
 └── docs/
     └── diagrams/
-        └── db-diagram.png                     # ERD diagram
-        └── grafana-dashboard.png              # matrix diagram
+    │   ├── db-diagram.png                     # ERD diagram
+    │   └── grafana-dashboard-example-image.png # matrix diagram
+    ├── db-diagram.drwaio                      # ERD diagram drwaio file
+    └── grafana-dashboard.json                 # grafana config file
 ```
 
 ---
