@@ -29,3 +29,7 @@ management:
     tags:
       application: hardship-service
 
+logging:
+  level:
+    org.springframework.web.servlet.resource: OFF # fix favicon 500 error
+

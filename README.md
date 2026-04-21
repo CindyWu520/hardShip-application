@@ -530,7 +530,8 @@ prometheus   running    0.0.0.0:9090->9090/tcp
 | Avg Response Time   | `rate(http_server_requests_seconds_sum[5m]) / rate(http_server_requests_seconds_count[5m])` | Time series   |
 | JVM Heap Memory     | `jvm_memory_used_bytes{area="heap"}`                                                        | Time series   |
 
-![grafana-dashboard](docs/diagrams/grafana-dashboard.png)
+[dashboard snapshot](http://localhost:3000/dashboard/snapshot/ApPcRiP9J6kCj0vXIyw2J2Bu1Mhg7Dk7)
+![grafana-dashboard](docs/diagrams/grafana-dashboard-example-image.png)
 
 ---
 
