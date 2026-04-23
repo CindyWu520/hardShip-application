@@ -12,9 +12,13 @@ import com.assignment.hardship.mapper.HardshipMapper;
 import com.assignment.hardship.repo.CustomerRepository;
 import com.assignment.hardship.repo.HardshipHistoryRepository;
 import com.assignment.hardship.repo.HardshipRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +51,12 @@ public class HardshipServiceTest {
     HardshipHistoryRepository hardshipHistoryRepo;
     @Mock
     HardshipMapper mapper;
+    @Mock
+    MeterRegistry meterRegistry;
+    @Mock
+    Counter counter;
+    @Mock
+    Timer timer;
     @InjectMocks
     HardshipServiceImpl hardshipService;
 
@@ -143,6 +155,8 @@ public class HardshipServiceTest {
     @Test
     void shouldRegisterHardshipSuccessfully() {
         // Arrange
+        mockCount();
+        mockTimer();
         when(hardshipRepo.existsByCustomerName(request.getName())).thenReturn(false);
         when(mapper.buildCustomer(any())).thenReturn(customer);
         when(customerRepo.save(any())).thenReturn(customer);
@@ -176,6 +190,7 @@ public class HardshipServiceTest {
     @Test
     void shouldUpdateHardshipSuccessfully() {
         // Arrange
+        mockCount();
         when(hardshipRepo.findById(any())).thenReturn(Optional.of(hardship));
         when(customerRepo.save(any())).thenReturn(customer);
         when(hardshipRepo.save(any())).thenReturn(hardship);
@@ -225,6 +240,7 @@ public class HardshipServiceTest {
     @Test
     void shouldThrowWhenHardshipAlreadyExists() {
         // Arrange
+        mockCount();
         when(hardshipRepo.existsByCustomerName(request.getName())).thenReturn(true);
 
         // Act + Assert
@@ -239,6 +255,7 @@ public class HardshipServiceTest {
     @Test
     void shouldThrowWhenHardshipNotFound() {
         // Arrange
+        mockCount();
         when(hardshipRepo.findById(any())).thenReturn(Optional.empty());
 
         // Act + Assert
@@ -248,5 +265,18 @@ public class HardshipServiceTest {
         verify(customerRepo, never()).save((any()));
         verify(hardshipRepo, never()).save((any()));
         verify(hardshipHistoryRepo, never()).save(any());
+    }
+
+    private void mockTimer() {
+        when(meterRegistry.timer(any())).thenReturn(timer);
+        when(timer.record(ArgumentMatchers.<Supplier<Object>>any())).thenAnswer(inv -> {
+            Supplier<Object> supplier = inv.getArgument(0);
+            return supplier.get();
+        });
+    }
+
+    private void mockCount() {
+        when(meterRegistry.counter(any())).thenReturn(counter);
+        doNothing().when(counter).increment();
     }
 }
