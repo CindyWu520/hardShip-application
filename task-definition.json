@@ -1,6 +1,7 @@
 {
   "family": "hardship-task",
   "networkMode": "bridge",
+  "executionRoleArn": "arn:aws:iam::039293892479:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "hardship-service",
