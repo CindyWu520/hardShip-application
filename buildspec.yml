@@ -6,23 +6,29 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_URI=$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
 
   build:
     commands:
       - echo Building JAR...
       - mvn clean package -DskipTests
       - echo Building Docker image...
-      - docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
-      - docker tag $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO:latest
+      - docker build -t $IMAGE_URI .
+      - docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPO:latest
 
   post_build:
     commands:
       - echo Pushing image to ECR...
-      - docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+      - docker push $IMAGE_URI
       - docker push $ECR_REGISTRY/$ECR_REPO:latest
-      - echo Writing image definitions...
-      - printf '[{"name":"hardship-service","imageUri":"%s"}]' $ECR_REGISTRY/$ECR_REPO:latest > imagedefinitions.json
+      - echo Updating task definition with new image...
+      - sed -i "s|placeholder|$IMAGE_URI|g" task-definition.json
+      - TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.json --query "taskDefinition.taskDefinitionArn" --output text)
+      - echo Registered task definition $TASK_DEF_ARN
+      - aws ecs update-service --cluster hardship-cluster --service hardship-service --task-definition $TASK_DEF_ARN
+      - printf '[{"name":"hardship-service","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
 
 artifacts:
   files:
     - imagedefinitions.json
+    - task-definition.json
