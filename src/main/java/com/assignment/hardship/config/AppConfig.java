@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 @EnableJpaAuditing
 public class AppConfig {
-    @Value("${cors.allowed-origins}")
+    @Value("${cors.allowed-origins:http://localhost:5173}")
     private List<String> allowedOrigins;
 
     @Bean
