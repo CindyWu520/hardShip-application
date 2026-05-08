@@ -3,10 +3,14 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+      - echo Logging in to ECR...
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - ECR_REPO=hardship-service
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_URI=$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+      - echo IMAGE_URI=$IMAGE_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
   build:
     commands:
@@ -16,24 +20,34 @@ phases:
 
   post_build:
     commands:
-      - echo Pushing image to ECR...
+      - echo Pushing to ECR...
       - docker push $IMAGE_URI
       - docker push $ECR_REGISTRY/$ECR_REPO:latest
 
       - echo Updating task definition with new image...
       - sed -i "s|placeholder|$IMAGE_URI|g" task-definition.json
+      - cat task-definition.json
 
-      # ✅ Register task definition from repo file
+      - echo Registering new task definition...
       - TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.json --query "taskDefinition.taskDefinitionArn" --output text)
-      - echo Registered task definition $TASK_DEF_ARN
+      - echo Registered $TASK_DEF_ARN
 
-      # ✅ Stop old task first — free up memory on t2.micro
-      - OLD_TASK=$(aws ecs list-tasks --cluster hardship-cluster --query "taskArns[0]" --output text)
-      - if [ "$OLD_TASK" != "None" ]; then aws ecs stop-task --cluster hardship-cluster --task $OLD_TASK; fi
-      - sleep 10
+      - echo Setting desired count to 0 - stop old task...
+      - aws ecs update-service --cluster hardship-cluster --service hardship-service --desired-count 0
+      - aws ecs wait services-stable --cluster hardship-cluster --services hardship-service
+      - echo Old task stopped
 
-      # ✅ Deploy new task definition
-      - aws ecs update-service --cluster hardship-cluster --service hardship-service --task-definition $TASK_DEF_ARN
+      - echo Deploying new task definition...
+      - aws ecs update-service --cluster hardship-cluster --service hardship-service --task-definition $TASK_DEF_ARN --desired-count 1 --force-new-deployment
+
+      - echo Waiting for new task to be running...
+      - aws ecs wait services-stable --cluster hardship-cluster --services hardship-service
+
+      - RUNNING=$(aws ecs describe-services --cluster hardship-cluster --services hardship-service --query "services[0].runningCount" --output text)
+      - echo Running task count $RUNNING
+      - if [ "$RUNNING" != "1" ]; then echo DEPLOYMENT FAILED; exit 1; fi
+      - echo Deployment complete!
+
       - printf '[{"name":"hardship-service","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
 
 artifacts:
