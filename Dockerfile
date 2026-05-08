@@ -8,7 +8,7 @@ RUN mvn dependency:go-offline -B
 
 # ✅ Then copy source and build
 COPY src ./src
-RUN mvn clean package -DskipTestsm
+RUN mvn clean package -DskipTests
 
 # Run stage
 FROM public.ecr.aws/amazoncorretto/amazoncorretto:21-al2023-headless
