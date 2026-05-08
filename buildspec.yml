@@ -19,10 +19,20 @@ phases:
       - echo Pushing image to ECR...
       - docker push $IMAGE_URI
       - docker push $ECR_REGISTRY/$ECR_REPO:latest
+
       - echo Updating task definition with new image...
       - sed -i "s|placeholder|$IMAGE_URI|g" task-definition.json
+
+      # ✅ Register task definition from repo file
       - TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.json --query "taskDefinition.taskDefinitionArn" --output text)
       - echo Registered task definition $TASK_DEF_ARN
+
+      # ✅ Stop old task first — free up memory on t2.micro
+      - OLD_TASK=$(aws ecs list-tasks --cluster hardship-cluster --query "taskArns[0]" --output text)
+      - if [ "$OLD_TASK" != "None" ]; then aws ecs stop-task --cluster hardship-cluster --task $OLD_TASK; fi
+      - sleep 10
+
+      # ✅ Deploy new task definition
       - aws ecs update-service --cluster hardship-cluster --service hardship-service --task-definition $TASK_DEF_ARN
       - printf '[{"name":"hardship-service","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
 
