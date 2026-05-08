@@ -10,3 +10,6 @@ Spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+
+cors:
+  allowed-origins: http://localhost:5173
