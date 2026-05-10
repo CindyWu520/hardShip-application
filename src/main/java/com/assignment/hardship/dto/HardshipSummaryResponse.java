@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -20,4 +21,11 @@ public class HardshipSummaryResponse {
     private Status status;
     @Schema(description = "Timestamp for creating hardship application", example = "2026-04-19T00:00:00")
     private LocalDateTime createdAt;
+
+    @Schema(description = "Customer date of birth", example = "1990-01-01")
+    private LocalDateTime dateOfBirth;
+    @Schema(description = "Annual income", example = "10000")
+    private BigDecimal income;
+    @Schema(description = "Annual expenses", example = "5000")
+    private BigDecimal expenses;
 }

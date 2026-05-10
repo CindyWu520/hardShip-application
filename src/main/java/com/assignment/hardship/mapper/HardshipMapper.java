@@ -47,5 +47,8 @@ public interface HardshipMapper {
 
     @Mapping(source = "id", target = "hardshipId")
     @Mapping(source = "customer.name", target = "name")
+    @Mapping(source = "customer.dateOfBirth", target = "dateOfBirth")
+    @Mapping(source = "customer.income", target = "income")
+    @Mapping(source = "customer.expenses", target = "expenses")
     HardshipSummaryResponse buildSummaryResponse(Hardship hardship);
 }
