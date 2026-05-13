@@ -111,4 +111,14 @@ public class HardshipServiceImpl implements HardshipService {
                 .map(hardshipMapper::buildSummaryResponse)
                 .toList();
     }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        log.info("Delete hardship id= {}", id);
+        if (!hardshipRepo.existsById(id)) {
+            throw new HardshipException(ErrorCode.HARDSHIP_NOT_FOUND);
+        }
+        hardshipRepo.deleteById(id);
+    }
 }

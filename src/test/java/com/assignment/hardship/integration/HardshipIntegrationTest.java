@@ -122,7 +122,11 @@ public class HardshipIntegrationTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].hardshipId").isNotEmpty())
-                .andExpect(jsonPath("$[0].name").value("cindy"));
+                .andExpect(jsonPath("$[0].name").value("cindy"))
+                .andExpect(jsonPath("$[0].dateOfBirth").value("1995-11-22"))
+                .andExpect(jsonPath("$[0].income").value("10000"))
+                .andExpect(jsonPath("$[0].expenses").value("5000")
+                );
     }
 
     // failure path

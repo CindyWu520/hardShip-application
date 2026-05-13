@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +44,7 @@ public class HardshipController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<HardshipResponse> createHardship(
             @RequestBody @Valid HardshipRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,6 +59,7 @@ public class HardshipController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     public ResponseEntity<HardshipResponse> updateHardship(
             @PathVariable Long id, @RequestBody @Valid HardshipRequest request) {
         return ResponseEntity.ok(hardshipService.updateHardship(id, request));
@@ -66,7 +70,16 @@ public class HardshipController {
             @ApiResponse(responseCode = "200", description = "List of hardships")
     })
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<HardshipSummaryResponse>> getAll() {
         return ResponseEntity.ok(hardshipService.getAllHardship());
+    }
+
+    @DeleteMapping("{/id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id) {
+        hardshipService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

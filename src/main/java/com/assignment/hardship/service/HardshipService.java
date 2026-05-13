@@ -14,4 +14,6 @@ public interface HardshipService {
     HardshipResponse updateHardship(Long id, HardshipRequest request);
 
     List<HardshipSummaryResponse> getAllHardship();
+
+    void delete(Long id);
 }

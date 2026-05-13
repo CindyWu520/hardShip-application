@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -23,7 +24,7 @@ public class HardshipSummaryResponse {
     private LocalDateTime createdAt;
 
     @Schema(description = "Customer date of birth", example = "1990-01-01")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
     @Schema(description = "Annual income", example = "10000")
     private BigDecimal income;
     @Schema(description = "Annual expenses", example = "5000")
