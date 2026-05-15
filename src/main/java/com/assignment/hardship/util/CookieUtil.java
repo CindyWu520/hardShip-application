@@ -16,10 +16,12 @@ public class CookieUtil {
     @Value("${app.jwt.refresh-expiration-ms}")
     private int refreshExpirationMs;
 
+    // register:step 5
     public void addAccessTokenCookie(HttpServletResponse response, String token) {
         addCookie(response, cookieName, token, accessExpirationMs / 1000);
     }
 
+    // register:step 6
     public void addRefreshTokenCookie(HttpServletResponse response, String token) {
         addCookie(response, refreshCookieName, token, refreshExpirationMs / 1000);
     }

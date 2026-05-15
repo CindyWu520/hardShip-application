@@ -115,10 +115,11 @@ public class HardshipServiceImpl implements HardshipService {
     @Override
     @Transactional
     public void delete(Long id) {
-        log.info("Delete hardship id= {}", id);
-        if (!hardshipRepo.existsById(id)) {
+        log.info("Deleting hardship id= {}", id);
+        if (!customerRepo.existsById(id)) {
             throw new HardshipException(ErrorCode.HARDSHIP_NOT_FOUND);
         }
-        hardshipRepo.deleteById(id);
+        customerRepo.deleteById(id); // will delete hardship, hardshipHistory automatically
+        log.info("Delete Hardship id= {} successfully", id);
     }
 }

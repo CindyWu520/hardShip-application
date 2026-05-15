@@ -29,12 +29,14 @@ public class JwtService {
     private long refreshExpirationMs;
 
     // ---token generation---
+    // step 1: role -> ROLE_USER
     public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
         return buildToken(claims, userDetails.getUsername(), jwtExpirationMs);
     }
 
+    // step 2: assign cindy(subject) role(claims) with jwt token with expiration time
     private String buildToken(Map<String, Object> extraClaims, String subject, long expirationMs) {
         return Jwts.builder()
                 .claims(extraClaims)
@@ -45,6 +47,7 @@ public class JwtService {
                 .compact();
     }
 
+    // step 3: freshToken don't need claim(role)
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpirationMs);
     }

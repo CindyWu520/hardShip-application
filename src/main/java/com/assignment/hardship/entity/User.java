@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
     @Column(name = "password", nullable = false)
@@ -45,6 +45,7 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean enabled = true; // default value: true
 
+    // needs User implements UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

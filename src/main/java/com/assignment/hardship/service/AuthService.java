@@ -34,12 +34,12 @@ public class AuthService {
     // --register--
     @Transactional
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request, HttpServletResponse response) {
-        if (userRepository.existsByUsername(request.useName())) {
+        if (userRepository.existsByUsername(request.username())) {
             throw new IllegalArgumentException("Username already existed");
         }
         Role role = request.role() != null ? request.role() : Role.ROLE_USER;
         User user = User.builder()
-                .username(request.useName())
+                .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .role(role)
                 .build();
@@ -53,14 +53,14 @@ public class AuthService {
     // --login--
     public AuthDto.AuthResponse login(AuthDto.LoginRequest request, HttpServletResponse response) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.useName(), request.password())
+                new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
-        User user = userRepository.findByUsername(request.useName())
+        User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         issueTokens(user, response);
-        return new AuthDto.AuthResponse(request.useName(), user.getRole().name(), "Login successful");
+        return new AuthDto.AuthResponse(request.username(), user.getRole().name(), "Login successful");
     }
 
     // --logout--
@@ -89,6 +89,7 @@ public class AuthService {
 
     // --helpers
 
+    // login: step 1: generate access/refresh token
     public void issueTokens(User user, HttpServletResponse response) {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    AuthService authService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthDto.AuthResponse> register(
@@ -35,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthDto.AuthResponse> logout(
+    public ResponseEntity<Void> logout(
             HttpServletResponse response) {
         authService.logout(response);
         return ResponseEntity.noContent().build();

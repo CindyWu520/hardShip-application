@@ -2,12 +2,11 @@ spring:
   profiles:
     active: local # overridden by ECS env var in prod
   jpa:
-    hibernate:
-      ddl-auto: update #dev
+    open-in-view: false # stop session open for entire Http request, force load everything in service layer
+    show-sql: false # show sql in console (P6Spy instead)
     properties:
       hibernate:
-        format_sql: true
-    show-sql: true
+        format_sql: false # format sql (P6Spy instead)
 
 springdoc:
   api-docs:
@@ -29,7 +28,7 @@ management:
     tags:
       application: hardship-service
 
-logging:
-  level:
-    org.springframework.web.servlet.resource: OFF # fix favicon 500 error
+
+
+
 

@@ -54,6 +54,8 @@ public class Hardship {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "hardship", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hardship", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HardshipHistory> history;
+
+    // TODO: add isActive to avoid hard delete in production
 }

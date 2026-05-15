@@ -45,6 +45,7 @@ public class Customer {
     @Digits(integer = 10, fraction = 2)
     private BigDecimal expenses;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    // remove customer(parent) will remove hardship(children)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Hardship hardShip;
 }

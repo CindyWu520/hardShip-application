@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Configuration
 @EnableJpaAuditing
 public class AppConfig {
-
     @Bean
     public OpenAPI hardshipOpenAPI() {
         return new OpenAPI()

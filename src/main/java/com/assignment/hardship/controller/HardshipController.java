@@ -75,7 +75,7 @@ public class HardshipController {
         return ResponseEntity.ok(hardshipService.getAllHardship());
     }
 
-    @DeleteMapping("{/id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id) {

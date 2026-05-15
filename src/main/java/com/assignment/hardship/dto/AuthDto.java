@@ -10,21 +10,21 @@ public final class AuthDto {
 
     public record LoginRequest(
             @NotBlank @Size(max = 64)
-            String useName,
+            String username,
             String password
     ) {
     }
 
     public record RegisterRequest(
             @NotBlank @Size(max = 64)
-            String useName,
+            String username,
             @NotBlank @Size(min = 8, max = 100)
             String password,
             Role role // optional
     ) {
     }
 
-    public record AuthResponse(String userName, String role, String message) {
+    public record AuthResponse(String username, String role, String message) {
     }
 
     public record MeResponse(String username, String role) {
